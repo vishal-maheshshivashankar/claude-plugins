@@ -26,6 +26,19 @@ To update after this repo changes:
 /plugin marketplace update vishalm-claude-plugins
 ```
 
+## Using a plugin's Copilot bundle
+
+For plugins that ship a `copilot/` subfolder, install it into whichever repo you want it in:
+
+```bash
+git clone https://github.com/vishal-maheshshivashankar/claude-plugins.git
+./claude-plugins/plugins/<plugin-name>/install-copilot.sh /path/to/target/repo
+```
+
+Unlike the Claude Code plugin install above, this is per-repo — re-run it for each repo you want
+the Copilot prompt in. See each plugin's own README for exact commands and an experimental
+one-time global install option.
+
 ## Plugins
 
 | Plugin | Description |
