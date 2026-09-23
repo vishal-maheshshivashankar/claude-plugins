@@ -1,67 +1,20 @@
 #!/usr/bin/env bash
-# Installs this plugin's Copilot bundle (prompt file + instructions snippet).
-# GitHub Copilot has no portable plugin-installer, so this is the closest
-# equivalent. Two modes:
+# Installs this tool's Copilot bundle (prompt file + instructions snippet)
+# into a target repo's .github/ folder. GitHub Copilot has no portable
+# plugin-installer and no confirmed machine-wide install location — a
+# ~/.copilot/ global install was tried and confirmed NOT picked up by
+# standard VS Code Copilot Chat (tested 2026-09-23), so this is per-repo
+# only. Safe to re-run (idempotent).
 #
-#   install-copilot.sh <path-to-target-repo>   Per-repo install (reliable today,
-#                                               works in standard VS Code Copilot
-#                                               Chat). Copies into that repo's
-#                                               .github/ — must be re-run per repo.
-#
-#   install-copilot.sh --global                EXPERIMENTAL. Copies into
-#                                               ~/.copilot/prompts/, which VS Code's
-#                                               docs describe as a user-level
-#                                               location read by "Agent Host"
-#                                               sessions — not confirmed to work in
-#                                               standard VS Code Copilot Chat. Try
-#                                               it, but don't rely on it until
-#                                               you've verified Copilot Chat in your
-#                                               setup actually picks it up.
-#
-# Safe to re-run either mode (idempotent).
+# Usage: install-copilot.sh <path-to-target-repo>
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MODE="${1:-}"
-
-install_prompt_and_snippet() {
-  local prompts_dir="$1" instructions_file="$2"
-
-  mkdir -p "$prompts_dir"
-  cp "$SCRIPT_DIR/copilot/prompts/code-review.prompt.md" "$prompts_dir/code-review.prompt.md"
-  echo "Copied code-review.prompt.md -> $prompts_dir/"
-
-  local snippet="$SCRIPT_DIR/copilot/copilot-instructions.snippet.md"
-  local marker="## Local code review (code-review)"
-
-  if [[ -f "$instructions_file" ]] && grep -qF "$marker" "$instructions_file"; then
-    echo "$(basename "$instructions_file") already has the code-review section, leaving it as-is."
-  else
-    mkdir -p "$(dirname "$instructions_file")"
-    touch "$instructions_file"
-    {
-      echo ""
-      cat "$snippet"
-    } >> "$instructions_file"
-    echo "Appended code-review section -> $instructions_file"
-  fi
-}
-
-if [[ "$MODE" == "--global" ]]; then
-  echo "EXPERIMENTAL: installing to ~/.copilot/ (Agent Host user-level location, not"
-  echo "confirmed to work in standard VS Code Copilot Chat — verify it's picked up)."
-  install_prompt_and_snippet "$HOME/.copilot/prompts" "$HOME/.copilot/copilot-instructions.md"
-  echo "Done. Try /code-review in Copilot Chat from any project; if it's not found,"
-  echo "fall back to the per-repo install: install-copilot.sh <path-to-target-repo>"
-  exit 0
-fi
-
-TARGET_REPO="$MODE"
+TARGET_REPO="${1:-}"
 
 if [[ -z "$TARGET_REPO" ]]; then
   echo "Usage: install-copilot.sh <path-to-target-repo>" >&2
-  echo "       install-copilot.sh --global   (experimental, see script header)" >&2
   exit 1
 fi
 
@@ -70,5 +23,25 @@ if [[ ! -d "$TARGET_REPO/.git" ]]; then
   exit 1
 fi
 
-install_prompt_and_snippet "$TARGET_REPO/.github/prompts" "$TARGET_REPO/.github/copilot-instructions.md"
+PROMPTS_DIR="$TARGET_REPO/.github/prompts"
+INSTRUCTIONS_FILE="$TARGET_REPO/.github/copilot-instructions.md"
+
+mkdir -p "$PROMPTS_DIR"
+cp "$SCRIPT_DIR/copilot/prompts/code-review.prompt.md" "$PROMPTS_DIR/code-review.prompt.md"
+echo "Copied code-review.prompt.md -> $PROMPTS_DIR/"
+
+SNIPPET="$SCRIPT_DIR/copilot/copilot-instructions.snippet.md"
+MARKER="## Local code review (code-review)"
+
+if [[ -f "$INSTRUCTIONS_FILE" ]] && grep -qF "$MARKER" "$INSTRUCTIONS_FILE"; then
+  echo "$(basename "$INSTRUCTIONS_FILE") already has the code-review section, leaving it as-is."
+else
+  touch "$INSTRUCTIONS_FILE"
+  {
+    echo ""
+    cat "$SNIPPET"
+  } >> "$INSTRUCTIONS_FILE"
+  echo "Appended code-review section -> $INSTRUCTIONS_FILE"
+fi
+
 echo "Done. In Copilot Chat, run /code-review (or reference the prompt file directly)."

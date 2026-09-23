@@ -112,9 +112,11 @@ rather than symlinks.)
 
 ## Install & use — GitHub Copilot
 
-Copilot has no plugin installer and no confirmed machine-wide install path in standard VS Code
-Copilot Chat today (see the experimental option at the end), so this is a **per-repo file copy**
-— unrelated to the Claude Code install above, and unaffected by the standalone-vs-plugin choice.
+Copilot has no plugin installer, and there's no machine-wide install for it either — this is a
+**per-repo file copy**, unrelated to the Claude Code install above and unaffected by the
+standalone-vs-plugin choice there. (A `~/.copilot/` global install was tried and confirmed **not**
+picked up by standard VS Code Copilot Chat — tested 2026-09-23 — so per-repo is the only option
+that actually works today, not just the safe default.)
 
 ### 1. Prerequisites
 
@@ -182,19 +184,6 @@ rm /path/to/some/other/repo/.github/prompts/code-review.prompt.md
 ...and manually remove the `## Local code review (code-review)` section from that repo's
 `.github/copilot-instructions.md`.
 
-### Experimental: one global install instead of per-repo
-
-```bash
-./claude-plugins/tools/code-reviewer/install-copilot.sh --global
-```
-
-This copies the same two files into `~/.copilot/` instead of a specific repo's `.github/`. VS
-Code's own docs describe `~/.copilot/` as a user-level location read by a newer "Agent Host"
-session type — if your Copilot setup uses that, this could give you the same "install once, use
-in every repo" behavior the Claude Code skill above has. **This is not confirmed to work in
-standard VS Code Copilot Chat.** After running it, open Copilot Chat in some other repo and check
-whether `/code-review` shows up; if it doesn't, fall back to the per-repo install above.
-
 ---
 
 ## Requirements summary
@@ -213,5 +202,5 @@ skills/code-reviewer/scripts/              git/GitLab/GitHub plumbing (clone/rev
 copilot/prompts/code-review.prompt.md      The Copilot Chat equivalent — /code-review
 copilot/copilot-instructions.snippet.md    Appended into a target repo's copilot-instructions.md
 install-claude.sh                          Symlinks skill+agent into ~/.claude/ (Claude Code)
-install-copilot.sh                         Copies prompt+snippet into a target repo (or --global)
+install-copilot.sh                         Copies prompt+snippet into a target repo (per-repo only)
 ```
