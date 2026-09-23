@@ -1,5 +1,5 @@
 ---
-name: local
+name: code-reviewer
 description: Review a GitLab MR, a GitHub PR (by URL or ID), a pasted MR/PR description, or — when none of those is available — the current local branch's changes against a target branch you confirm with the user first. Runs entirely in this local session and only ever reports findings in this chat — it never posts a comment, note, review, or approval back to the MR/PR. Mirrors robin's code-review-dev process (same parallel code-reviewer agents, same confidence-based filtering, same findings format) with the remote-posting step removed entirely. Use when the user pastes an MR/PR URL, or the full MR/PR description text, and wants a local-only review report.
 argument-hint: <MR-URL|PR-URL|MR-ID> | <pasted MR/PR description> | (no argument = review local branch changes)
 tools: Read, Bash, Grep, Glob, Agent, AskUserQuestion, Write
@@ -23,14 +23,15 @@ findings format. Differences, all deliberate:
   a GitLab MR URL or bare numeric ID uses `glab` (matching robin's original environment).
 - Runs directly against your local checkout — no sandbox, no `claude()`/`bash()` HTTP hop.
 
-Depends on this plugin's own `agents/code-reviewer.md` (same agent robin uses) to actually
-perform the review in Step 2, and on `scripts/git-utils.sh` in this skill's own directory for the
-`clone` / `review` / `summary` git+forge plumbing. Always invoke the script via
-`"${CLAUDE_PLUGIN_ROOT}"` so the path resolves correctly regardless of where the plugin was
-installed from:
+Depends on the `code-reviewer` agent installed alongside this skill at
+`~/.claude/agents/code-reviewer.md` (same agent robin uses) to actually perform the review in
+Step 2, and on `scripts/git-utils.sh` next to this file for the `clone` / `review` / `summary`
+git+forge plumbing. This is a standalone (non-plugin) global skill, installed via
+`install-claude.sh` into `~/.claude/skills/code-reviewer/`, so invoke the script via that fixed
+path:
 
 ```bash
-"${CLAUDE_PLUGIN_ROOT}"/skills/local/scripts/git-utils.sh <command> [args...]
+~/.claude/skills/code-reviewer/scripts/git-utils.sh <command> [args...]
 ```
 
 Prerequisites: `git`, `jq` on PATH (always). `glab` (authenticated) for GitLab MR mode; `gh`
@@ -64,11 +65,11 @@ git status --porcelain
 - **Dirty working tree**: use `review`, which creates a separate worktree so in-progress work is
   undisturbed:
   ```bash
-  "${CLAUDE_PLUGIN_ROOT}"/skills/local/scripts/git-utils.sh review <MR-ID|MR-URL|PR-URL>
+  ~/.claude/skills/code-reviewer/scripts/git-utils.sh review <MR-ID|MR-URL|PR-URL>
   ```
 - **Clean working tree**: `clone` checks out the MR/PR branch directly in place:
   ```bash
-  "${CLAUDE_PLUGIN_ROOT}"/skills/local/scripts/git-utils.sh clone <MR-URL|PR-URL>
+  ~/.claude/skills/code-reviewer/scripts/git-utils.sh clone <MR-URL|PR-URL>
   ```
 - **Reviewing an MR/PR from a different repo than the one open here**: `clone` also handles
   that — it clones into `$WORKSPACE` (default `~/workspace`) and checks out the branch.
