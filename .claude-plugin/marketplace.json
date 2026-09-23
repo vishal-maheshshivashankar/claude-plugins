@@ -1,0 +1,18 @@
+{
+  "name": "vishalm-claude-plugins",
+  "owner": {
+    "name": "Vishal M"
+  },
+  "description": "Personal marketplace of Claude Code plugins. Each plugin also ships a GitHub Copilot-compatible bundle under its own copilot/ folder for manual install into other repos.",
+  "plugins": [
+    {
+      "name": "code-review-local",
+      "source": "./plugins/code-review-local",
+      "displayName": "Local Code Review",
+      "description": "Review a GitLab MR, GitHub PR, pasted MR/PR description, or local branch diff, using the same confidence-scored code-reviewer agent as robin's code-review-dev process — but reports findings only in this chat session and never posts a comment, review, or approval back to the MR/PR.",
+      "version": "0.1.0",
+      "category": "code-review",
+      "keywords": ["code-review", "mr", "pr", "gitlab", "github", "local"]
+    }
+  ]
+}

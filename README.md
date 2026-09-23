@@ -1,0 +1,40 @@
+# claude-plugins
+
+Personal marketplace of Claude Code plugins (private). One folder per plugin under `plugins/`,
+catalogued in `.claude-plugin/marketplace.json`. Where a plugin's functionality also makes sense
+in GitHub Copilot, it ships a `copilot/` subfolder with the Copilot-equivalent prompt file plus a
+small install script — Copilot has no plugin-installer of its own, so that's a manual copy into
+the target repo's `.github/` folder rather than a one-line install.
+
+## Using this as a Claude Code plugin marketplace
+
+From any machine, in any Claude Code session:
+
+```
+/plugin marketplace add vishal-maheshshivashankar/claude-plugins
+/plugin install <plugin-name>
+```
+
+To update after this repo changes:
+
+```
+/plugin marketplace update vishalm-claude-plugins
+```
+
+## Plugins
+
+| Plugin | Description |
+|---|---|
+| [`code-review-local`](plugins/code-review-local) | Local-only MR/PR review (GitLab MR, GitHub PR, pasted description, or local branch diff) — reports findings only in chat, never posts back to the MR/PR. Copilot bundle included. |
+
+## Adding a new plugin
+
+1. `mkdir -p plugins/<name>/.claude-plugin` and add a `plugin.json` (`name` is the only required
+   field; see any existing plugin for the fuller shape).
+2. Add `skills/`, `agents/`, `commands/`, or `hooks.json` as needed, following the [plugin
+   directory conventions](https://code.claude.com/docs/en/plugins-reference).
+3. Add an entry to `.claude-plugin/marketplace.json`'s `plugins` array with `name` and
+   `source: "./plugins/<name>"`.
+4. If it has a Copilot equivalent, put it under `plugins/<name>/copilot/` with its own
+   `install-copilot.sh`, matching `code-review-local`'s layout.
+5. Commit and push — `/plugin marketplace update` on any installed machine picks it up.
