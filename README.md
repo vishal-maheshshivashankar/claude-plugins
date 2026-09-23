@@ -15,6 +15,11 @@ From any machine, in any Claude Code session:
 /plugin install <plugin-name>
 ```
 
+This is a one-time, machine-wide install: once installed, a plugin is available in every project
+you open on that machine afterwards, not just the one you ran the command in. Plugin skills are
+always namespaced as `/plugin-name:skill-name` (Claude Code's own collision-prevention design),
+so e.g. `code-review`'s skill is invoked as `/code-review:local`, not a bare `/code-review`.
+
 To update after this repo changes:
 
 ```
@@ -25,7 +30,7 @@ To update after this repo changes:
 
 | Plugin | Description |
 |---|---|
-| [`code-review-local`](plugins/code-review-local) | Local-only MR/PR review (GitLab MR, GitHub PR, pasted description, or local branch diff) — reports findings only in chat, never posts back to the MR/PR. Copilot bundle included. |
+| [`code-review`](plugins/code-review) | Local-only MR/PR review (GitLab MR, GitHub PR, pasted description, or local branch diff) — reports findings only in chat, never posts back to the MR/PR. Invoke as `/code-review:local`. Copilot bundle included (`/code-review` there, per-repo install). |
 
 ## Adding a new plugin
 
@@ -36,5 +41,5 @@ To update after this repo changes:
 3. Add an entry to `.claude-plugin/marketplace.json`'s `plugins` array with `name` and
    `source: "./plugins/<name>"`.
 4. If it has a Copilot equivalent, put it under `plugins/<name>/copilot/` with its own
-   `install-copilot.sh`, matching `code-review-local`'s layout.
+   `install-copilot.sh`, matching `code-review`'s layout.
 5. Commit and push — `/plugin marketplace update` on any installed machine picks it up.

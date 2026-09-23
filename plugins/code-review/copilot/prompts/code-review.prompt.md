@@ -9,9 +9,9 @@ tools: ['search/codebase', 'search', 'web/githubRepo', 'read/problems', 'vscodeT
 Input for this review (a GitLab MR URL, a GitHub PR URL, a bare MR ID, a pasted MR/PR
 description, or nothing): ${input:target}
 
-This is the Copilot Chat equivalent of the Claude Code skill at
-`.claude/skills/code-review-local/SKILL.md` in this same folder — same steps, same
-confidence-based filtering, same output format. The one thing that differs from Copilot's own
+This is the Copilot Chat equivalent of the `code-review` Claude Code plugin's `local` skill
+(invoked there as `/code-review:local`) — same steps, same confidence-based filtering, same
+output format. The one thing that differs from Copilot's own
 default PR-review behavior: **this never posts anything back to the MR/PR.** Every result of
 running this prompt is a chat message in this session, full stop — no submitted review, no
 comment, no approval, regardless of what you find or how confident you are.
